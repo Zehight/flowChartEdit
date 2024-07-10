@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { Handle, Position,useNode } from '@vue-flow/core'
+import { Handle, Position,useNode,useVueFlow } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import {Delete} from '@element-plus/icons-vue'
-import {useVueFlow} from '_@vue-flow_core@1.38.2@@vue-flow/core'
 const { removeNodes } = useVueFlow()
 
 

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useNode } from '@vue-flow/core'
-import {Position} from '_@vue-flow_core@1.38.2@@vue-flow/core'
+import { useNode,Position,useVueFlow } from '@vue-flow/core'
+
 import {Delete} from '@element-plus/icons-vue'
-import {useVueFlow} from '_@vue-flow_core@1.38.2@@vue-flow/core'
+
 const { removeNodes } = useVueFlow()
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import wrench from '@/assets/image/che1.png'
