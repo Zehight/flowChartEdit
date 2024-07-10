@@ -1,0 +1,1 @@
+import{_ as e,o,c as t}from"./index.ef7f8c0a.js";const r={};function s(c,u){return o(),t("div",null,"404")}const n=e(r,[["render",s],["__file","C:/Users/kagari/Documents/project/mjs-project-test/src/views/common/NotFound.vue"]]);export{n as default};
