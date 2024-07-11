@@ -348,7 +348,7 @@ function handleExportData(){
 <!--            <el-tag size="large" style="margin-right: 12px;min-width: 150px">当前选中节点Id:{{currentNode?.id}}</el-tag>-->
             <el-button @click="handleHideNode">{{ visibleFlag?'隐藏透明节点':'显示透明节点' }}</el-button>
 <!--            <el-button @click="handleDelNode">删除节点</el-button>-->
-            <el-button @click="handleShowData">查看数据</el-button>
+<!--            <el-button @click="handleShowData">查看数据</el-button>-->
             <el-button @click="handleExportData">导出数据</el-button>
             <el-upload
                 style="margin-left: 8px"
