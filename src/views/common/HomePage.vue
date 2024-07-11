@@ -21,16 +21,7 @@ onConnect(addEdges)
 const useId:any = ref(null)
 
 onMounted(()=>{
-  let id = Number(localStorage.getItem('useId'))
-  if (!id) {
-    localStorage.setItem('useId','10')
-    id = Number(localStorage.getItem('useId'))
-    useId.value = id
-  }else{
-    useId.value = id
-  }
   loadData()
-
 })
 
 const commonTransparentEdgeConfig={
@@ -132,9 +123,11 @@ function saveData(){
 
 function loadData(){
   const findNodes = JSON.parse(localStorage.getItem('nodes'))
+
   if(!findNodes){
     addNodes(senceNodes)
     addEdges(senceEdges)
+
   }
   const locationEdges = JSON.parse(localStorage.getItem('edges'))
   if(locationEdges){
@@ -146,6 +139,11 @@ function loadData(){
     nodes.value=locationNodes
     // addNodes(locationNodes)
   }
+  nextTick(()=>{
+    const maxId = Math.max(...nodes.value.map(obj => Number(obj.id)))
+    localStorage.setItem('useId',String(maxId+1))
+  })
+
 }
 
 
@@ -285,6 +283,10 @@ function handleOnchange  (uploadFile: any)  {
     console.log(useData)
     nodes.value = useData.nodes
     edges.value = useData.edges
+    nextTick(()=>{
+      const maxId = Math.max(...nodes.value.map(obj => Number(obj.id)))
+      localStorage.setItem('useId',String(maxId+1))
+    })
   }
 }
 
