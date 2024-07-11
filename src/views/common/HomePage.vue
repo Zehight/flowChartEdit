@@ -314,11 +314,11 @@ function handleExportData(){
 
         @dragover="onDragOver"
         @dragleave="onDragLeave"
-        :pan-on-scroll="false"
-        :zoom-on-scroll="false"
-        :zoom-on-pinch="false"
-        :zoom-on-double-click="false"
-        :pan-on-drag="false"
+        :pan-on-scroll="true"
+        :zoom-on-scroll="true"
+        :zoom-on-pinch="true"
+        :zoom-on-double-click="true"
+        :pan-on-drag="true"
         :fit-view-on-init="true"
         :prevent-scrolling='false'
         :nodes-connectable="false"
