@@ -3,7 +3,6 @@ import { useNode,Position,useVueFlow } from '@vue-flow/core'
 import {Delete} from '@element-plus/icons-vue'
 const { removeNodes } = useVueFlow()
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import Bg from '@/assets/image/bgTest.png'
 
 
 const props = defineProps(['data'])
@@ -26,7 +25,7 @@ const progressGradient = computed(()=>{
 <!--  </NodeToolbar>-->
   <div class="node">
 <!--    <div class="commonTong" :style="progressGradient"/>-->
-    <el-image  :draggable="false" fit="contain" :src="Bg" style="width: 1920px;height: 1080px;opacity: 0.5"/>
+    <el-image  :draggable="false" fit="contain" src="https://mycos-1259115987.cos.ap-shanghai.myqcloud.com/mjsbg.png" style="width: 1920px;height: 1080px;opacity: 0.5"/>
 <!--    <div class="commonTong" style="background-color: #ffb546;height: 30px;width: 30px;position: absolute;top:0"/>-->
   </div>
 
