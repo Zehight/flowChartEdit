@@ -7,6 +7,7 @@ import { Background } from '@vue-flow/background'
 import ShiftingEdgeLabel from '@/components/customEdges/ShiftingEdgeLabel.vue'
 import lineImg from '@/assets/image/line.png'
 import tongImg from '@/assets/image/tong.png'
+import bgTest from '@/assets/image/bgTest.png'
 import wrench from '@/assets/image/che1.png'
 import Car from '@/assets/image/che2.png'
 import useDragAndDrop from '@/modules/useDnD'
@@ -17,7 +18,7 @@ import TongNode from '@/components/customNodes/TongNode.vue'
 // import type {ITestOneNodeData} from '@/components/customNodes/LineNode.vue'
 
 const { onDragOver, onDrop, onDragLeave,onDragStart } = useDragAndDrop()
-const { updateEdge, addEdges,updateNode,addNodes,onConnect,onNodeDoubleClick } = useVueFlow()
+const { updateEdge, addEdges,updateNode,addNodes,onConnect,onNodeDoubleClick,onEdgesChange,onNodesChange,removeNodes,removeEdges } = useVueFlow()
 onConnect(addEdges)
 
 const useId:any = ref(null)
@@ -31,6 +32,8 @@ onMounted(()=>{
   }else{
     useId.value = id
   }
+  loadData()
+
 })
 
 const commonTransparentEdgeConfig={
@@ -40,64 +43,138 @@ const commonTransparentEdgeConfig={
   labelStyle: { fill: 'white', fontWeight: 600 },
   labelBgPadding: [8, 4],
   labelBgBorderRadius: 2,
-  labelBgStyle: { fillOpacity:1,y:-18,fill:'#10b981',x:-8 },
+  labelBgStyle: { fillOpacity:0,y:-18,fill:'#10b981',x:-8 },
 }
 
-
-
-const nodes = ref<Node[]>([
+const senceNodes:any=[
   {
     id: '1',
-    position: { x: 250, y: 200 },
-    data: { label: '',text:'1',visible:true,toolBarVisible:false,relationNodeId:'2' },
     type: 'Line',
+    position:{x:0, y:0},
+    data: { label: '', text:'1',visible:true,toolBarVisible:false },
+
   },
   {
     id: '2',
-    position: { x: 200, y: 200 },
-    data: { label: '',text:'2',visible:true,toolBarVisible:false,relationNodeId:'1' },
     type: 'Line',
-  },{
+    position:{x:1920, y:0},
+    data: { label: '', text:'2',visible:true,toolBarVisible:false },
+  },
+  {
     id: '3',
-    position: { x: 300, y: 300 },
-    data: { label: '',text:'3',progress:50,toolBarVisible:false },
-    type: 'Tong'
+    type: 'Line',
+    position:{x:1920, y:1080},
+    data: { label: '', text:'3',visible:true,toolBarVisible:false },
+  },
+  {
+    id: '4',
+    type: 'Line',
+    position:{x:0, y:1080},
+    data: { label: '', text:'4',visible:true,toolBarVisible:false },
+  },
+  {
+    id: '5',
+    type: 'Bg',
+    position:{x:0, y:0},
+    data: { label: '', text:'4',visible:true,toolBarVisible:false },
+
+  },
+]
+
+const senceEdges:any=[
+  {
+    id: 'e1->2',
+    source: '1',
+    target: '2',
+    label: '',
+    ...commonTransparentEdgeConfig,
+    style: { stroke: 'rgb(255,255,255)', strokeWidth: 1 },
+    animated: false
+  },
+  {
+    id: 'e2->3',
+    source: '2',
+    target: '3',
+    label: '',
+    ...commonTransparentEdgeConfig,
+    style: { stroke: 'rgb(255,255,255)', strokeWidth: 1 },
+    animated: false
+  },
+  {
+    id: 'e3->4',
+    source: '3',
+    target: '4',
+    label: '',
+    ...commonTransparentEdgeConfig,
+    style: { stroke: 'rgb(255,255,255)', strokeWidth: 1 },
+    animated: false
+  },
+  {
+    id: 'e4->1',
+    source: '4',
+    target: '1',
+    label: '',
+    ...commonTransparentEdgeConfig,
+    style: { stroke: 'rgb(255,255,255)', strokeWidth: 1 },
+    animated: false
   }
+]
+
+const nodes = ref<Node[]>([
 ])
 
 const edges = ref<Edge[]>([
-  { id: 'e1-2',
-    source: '1',
-    target: '2',
-    type:'TestOne',
-    animated:true,
-    selectable:true,
-    label: () => h(ShiftingEdgeLabel, { label: 'e1-2', offset_y: -10,offset_x:0 }),
-    style: { stroke: 'rgb(59,184,212)', strokeWidth: 3 },
-    labelStyle: { fill: 'white', fontWeight: 600 },
-    labelBgPadding: [8, 4],
-    labelBgBorderRadius: 2,
-    labelBgStyle: { fillOpacity:1,y:-18,fill:'#10b981',x:-8 },
-  },
+
 ])
+
+function saveData(){
+  console.log(edges.value)
+  localStorage.setItem('edges',JSON.stringify(edges.value))
+  localStorage.setItem('nodes',JSON.stringify(nodes.value))
+}
+
+function loadData(){
+  const findNodes = JSON.parse(localStorage.getItem('nodes'))
+  if(!findNodes){
+    addNodes(senceNodes)
+    addEdges(senceEdges)
+  }
+  const locationEdges = JSON.parse(localStorage.getItem('edges'))
+  if(locationEdges){
+    // addEdges(locationEdges)
+    edges.value=locationEdges
+  }
+  const locationNodes = JSON.parse(localStorage.getItem('nodes'))
+  if(locationNodes){
+    nodes.value=locationNodes
+    // addNodes(locationNodes)
+  }
+}
 
 
 const visibleFlag = ref(true)
 function handleHideNode(){
+  visibleFlag.value = !visibleFlag.value
   if (visibleFlag.value){
     nodes.value.forEach((node) => {
       if(node.type === 'Line'){
-        node.data.visible = false
+        node.data.visible = true
+      }
+      if(node.type === 'Bg'){
+        node.hidden = false
       }
     })
   }else{
     nodes.value.forEach((node) => {
       if(node.type === 'Line'){
-        node.data.visible = true
+        node.data.visible = false
+      }
+      if(node.type === 'Bg'){
+        node.hidden = true
       }
     })
   }
-  visibleFlag.value = !visibleFlag.value
+
 }
 
 
@@ -107,10 +184,11 @@ function handleAddNode(event,type){
 
 const currentNode:any = ref()
 function handleNodeClick(e:any){
-  e.event.stopPropagation()
-  currentNode.value = e.node
-  console.log(currentNode.value)
-  // updateNode(e.node.id,{class:'selectNode'})
+  if(e.node.type==='Bg'){
+    nodes.value.forEach((node) => {
+      updateNode(node.id,{selectable:false,selected:false})
+    })
+  }
 }
 
 function handleEdgeClick(e:any){
@@ -119,12 +197,28 @@ function handleEdgeClick(e:any){
 }
 
 onNodeDoubleClick((event) => {
+  if(event.node.type==='Bg'){
+    return
+  }
   updateNode(event.node.id,{data:{...event.node.data,toolBarVisible:true}})
   nodes.value.forEach((node) => {
     if(node.id !== event.node.id){
       updateNode(node.id,{data:{...node.data,toolBarVisible:false}})
     }
   })
+})
+
+onEdgesChange(()=>{
+  saveData()
+})
+
+onNodesChange(()=>{
+  saveData()
+  updateNode(senceNodes[0].id,{position:senceNodes[0].position})
+  updateNode(senceNodes[1].id,{position:senceNodes[1].position})
+  updateNode(senceNodes[2].id,{position:senceNodes[2].position})
+  updateNode(senceNodes[3].id,{position:senceNodes[3].position})
+  updateNode(senceNodes[4].id,{position:senceNodes[4].position})
 })
 
 function handleShowData(){
@@ -161,7 +255,7 @@ function addLine(node:any){
   updateNode(node.id,{data:{...node.data,relationNodeId:`${id}`}})
   addNodes([{
     id: `${id}`,
-    position: { x: node.position.x+100, y: node.position.y },
+    position: { x: node.position.x+200, y: node.position.y },
     data: { label: '', text: String(id),visible:true,toolBarVisible:false,relationNodeId:`${node.id}` },
     type:'Line'
   }])
@@ -171,27 +265,44 @@ function addLine(node:any){
     id: edgeId,
     source: String(node.id),
     target: String(id),
-    label: () => h(ShiftingEdgeLabel, { label: edgeId, offset_y: -10 }),
+    label: edgeId,
     ...commonTransparentEdgeConfig
   }])
 }
 
-watch(nodes,(nv,ov)=>{
-  if (ov.length>nv.length) return
-  const node = nodes.value[nodes.value.length-1]
-  if(node.type === 'Line'){
-    addLine(node)
+// watch(nodes,(nv,ov)=>{
+//   if (ov.length>nv.length) return
+//   const node = nodes.value[nodes.value.length-1]
+//   if(node.type === 'Line'){
+//     addLine(node)
+//   }
+// })
+
+function handleOnchange  (uploadFile: any)  {
+  let file = uploadFile.raw  // 获取文件信息
+  const fileReader = new FileReader()
+  fileReader.readAsText(file!)  // 开始读取文件的内容为二进制
+  fileReader.onload = (ev) => { // 读取完成,对数据进行自己的操作
+    const data = ev.target?.result //获取内容
+    console.log(JSON.parse(data as string))
   }
-})
+}
 
-
+function handleExportData(){
+  const json = JSON.stringify({nodes:nodes.value,edges:edges.value})
+  const blob = new Blob([json], { type: 'application/json' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = 'data.json'
+  a.click()
+}
 
 </script>
 
 <template>
   <TheContainer>
 
-    <div class="main" @drop="onDrop">
+    <div class="main" @drop="onDrop" style="z-index: 100">
       <VueFlow
         style="width: 100vw;height: calc(100vh - 60px);border: 1px solid black;"
         v-model:nodes="nodes"
@@ -205,7 +316,7 @@ watch(nodes,(nv,ov)=>{
         :zoom-on-pinch="false"
         :zoom-on-double-click="false"
         :pan-on-drag="false"
-        :fit-view-on-init="false"
+        :fit-view-on-init="true"
         :prevent-scrolling='false'
         :nodes-connectable="false"
 
@@ -222,10 +333,14 @@ watch(nodes,(nv,ov)=>{
         <template #node-Car="props">
           <CarNode :data="props.data" />
         </template>
+        <template #node-Bg="props">
+          <BgNode :data="props.data" />
+        </template>
 
         <template #edge-TestOne="props" >
           <TestOneEdge v-bind="props"/>
         </template>
+
 
         <Background style="background-color: rgb(0,18,29);" />
         <Panel>
@@ -234,6 +349,17 @@ watch(nodes,(nv,ov)=>{
             <el-button @click="handleHideNode">{{ visibleFlag?'隐藏透明节点':'显示透明节点' }}</el-button>
 <!--            <el-button @click="handleDelNode">删除节点</el-button>-->
             <el-button @click="handleShowData">查看数据</el-button>
+            <el-button @click="handleExportData">导出数据</el-button>
+            <el-upload
+                style="margin-left: 8px"
+                :show-file-list="false"
+                accept=".json"
+                :auto-upload="false"
+                :limit="1"
+                :on-change="handleOnchange"
+            >
+              <el-button>导入数据</el-button>
+            </el-upload>
           </el-row>
         </Panel>
         <Panel style="top:40px">
@@ -257,7 +383,9 @@ watch(nodes,(nv,ov)=>{
 
         </Panel>
       </VueFlow>
+<!--      <el-image :draggable="false" style="position: absolute;top:46px;left: 253.4px;height: 796px;z-index: 0" fit="cover" :src="bgTest"/>-->
     </div>
+
   </TheContainer>
 </template>
 

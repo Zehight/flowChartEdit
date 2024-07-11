@@ -1,5 +1,6 @@
 import { useVueFlow } from '@vue-flow/core'
 import { ref, watch } from 'vue'
+import ShiftingEdgeLabel from '@/components/customEdges/ShiftingEdgeLabel.vue'
 
 
 
@@ -28,10 +29,21 @@ const state = {
   isDragging: ref(false),
 }
 
+
+const commonTransparentEdgeConfig={
+  type: 'TestOne',
+  animated:true,
+  style: { stroke: 'rgb(59,184,212)', strokeWidth: 3 },
+  labelStyle: { fill: 'white', fontWeight: 600 },
+  labelBgPadding: [8, 4],
+  labelBgBorderRadius: 2,
+  labelBgStyle: { fillOpacity:0,y:-18,fill:'#10b981',x:-8 },
+}
+
 export default function useDragAndDrop() {
   const { draggedType, isDragOver, isDragging } = state
 
-  const { addNodes, screenToFlowCoordinate, onNodesInitialized, updateNode } = useVueFlow()
+  const { addEdges,addNodes, screenToFlowCoordinate, onNodesInitialized, updateNode } = useVueFlow()
 
   watch(isDragging, (dragging) => {
     document.body.style.userSelect = dragging ? 'none' : ''
@@ -95,19 +107,44 @@ export default function useDragAndDrop() {
         position,
         data: { label: '', text: String(nodeId),visible:true,toolBarVisible:false },
       }
-      addNodes(newNode)
-    }else{
+      const nodeId2 = getId()
+      const position2 = {
+        x: newNode.position.x+200,
+        y: newNode.position.y,
+      }
+      const newNode2:any = {
+        id: nodeId2,
+        type: 'Line',
+        position:position2,
+        data: { label: '', text: nodeId2,visible:true,toolBarVisible:false },
+      }
+      addNodes([newNode,newNode2])
+      const edgeId = 'e' +newNode.id + '>' + newNode2.id
+      addEdges([{
+        id: edgeId,
+        source: newNode.id,
+        target: newNode2.id,
+        label: edgeId,
+        ...commonTransparentEdgeConfig
+      }])
+    }else if(draggedType.value === 'Tong'){
       const newNode:any = {
         id: nodeId,
         type: draggedType.value,
         position,
-        data: { label: nodeId },
+        data: { label: '',text: String(nodeId),progress:50,toolBarVisible:false },
       }
       addNodes(newNode)
     }
-
-
-    
+    else{
+      const newNode:any = {
+        id: nodeId,
+        type: draggedType.value,
+        position,
+        data: { label: '',text: String(nodeId),toolBarVisible:false },
+      }
+      addNodes(newNode)
+    }
   }
 
   return {

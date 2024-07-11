@@ -11,7 +11,7 @@ const currentNode = useNode(props.data.text).node
 const progressGradient = computed(()=>{
   let progress = props.data.progress || 40
   let buZheng = 0.4*(1-progress*0.01)
-  progress = String(progress*(1+buZheng))
+  progress = Number(String(progress * (1 + buZheng)))
   return `background: linear-gradient(to top, rgb(17,53,73) ${progress}%, rgb(201,235,245) ${progress}%);`
 })
 
@@ -50,7 +50,7 @@ function updateData(type:string){
 }
 
 .commonTong{
-  clip-path: polygon(79.9% 100%,21.12% 100%,2.26% 0%,49.37% 0%,100% 0%);
+  clip-path: polygon(50% 0%, 100% 0, 100% 70%, 50% 100%, 0 70%, 0 0);
   height: 40px;width: 40px;
 }
 

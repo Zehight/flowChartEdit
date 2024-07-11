@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EdgeProps } from '@vue-flow/core'
 import { StraightEdge } from '@vue-flow/core'
+import ShiftingEdgeLabel from '@/components/customEdges/ShiftingEdgeLabel.vue'
 
 
 
@@ -8,11 +9,16 @@ import { StraightEdge } from '@vue-flow/core'
 const props = defineProps<EdgeProps>()
 
 
-
+const label=() => h(ShiftingEdgeLabel, { label: props.label, offset_y: -10,offset_x:20 })
 </script>
 
 
 
 <template>
-  <StraightEdge :offset="0" v-bind="props"/>
+  <StraightEdge
+      style="z-index: -10;"
+      v-bind="props"
+      :label="label"
+  >
+  </StraightEdge>
 </template>
