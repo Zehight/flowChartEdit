@@ -281,7 +281,10 @@ function handleOnchange  (uploadFile: any)  {
   fileReader.readAsText(file!)  // 开始读取文件的内容为二进制
   fileReader.onload = (ev) => { // 读取完成,对数据进行自己的操作
     const data = ev.target?.result //获取内容
-    console.log(JSON.parse(data as string))
+    const useData = JSON.parse(data as string)
+    console.log(useData)
+    nodes.value = useData.nodes
+    edges.value = useData.edges
   }
 }
 
@@ -292,6 +295,7 @@ function handleExportData(){
   a.href = URL.createObjectURL(blob)
   a.download = 'data.json'
   a.click()
+
 }
 
 </script>
