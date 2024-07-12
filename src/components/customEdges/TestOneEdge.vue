@@ -1,20 +1,23 @@
 <script setup lang="ts">
-import type { EdgeProps } from '@vue-flow/core'
-import { StraightEdge } from '@vue-flow/core'
+import {EdgeProps, Position} from '@vue-flow/core'
+import { StraightEdge,useEdge } from '@vue-flow/core'
 import ShiftingEdgeLabel from '@/components/customEdges/ShiftingEdgeLabel.vue'
+import { NodeToolbar } from '@vue-flow/node-toolbar'
+import {Delete} from '@element-plus/icons-vue'
 
 
-
-// props were passed from the slot using `v-bind="customEdgeProps"`
 const props = defineProps<EdgeProps>()
+const currentEdge = useEdge(props.id)
 
-
-const label=() => h(ShiftingEdgeLabel, { label: props.label, offset_y: -10,offset_x:20 })
+const label=() => h(ShiftingEdgeLabel, { label: props.data.label, offset_y: -10,offset_x:30 })
 </script>
 
 
 
 <template>
+  <NodeToolbar :is-visible="props.data.toolBarVisible" :position="Position.Top">
+    <el-button type="danger" size="small" :icon="Delete" circle />
+  </NodeToolbar>
   <StraightEdge
       style="z-index: -10;"
       v-bind="props"

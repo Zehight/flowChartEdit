@@ -9,13 +9,12 @@ import tongImg from '@/assets/image/tong.png'
 import wrench from '@/assets/image/che1.png'
 import Car from '@/assets/image/che2.png'
 import useDragAndDrop from '@/modules/useDnD'
-
 import type { Node, Edge } from '@vue-flow/core'
-import TongNode from '@/components/customNodes/TongNode.vue'
+import {ControlButton, Controls} from '@vue-flow/controls'
 // import type {ITestOneNodeData} from '@/components/customNodes/LineNode.vue'
 
 const { onDragOver, onDrop, onDragLeave,onDragStart } = useDragAndDrop()
-const { updateEdge, addEdges,updateNode,addNodes,onConnect,onNodeDoubleClick,onEdgesChange,onNodesChange,removeNodes,removeEdges } = useVueFlow()
+const { updateEdge, addEdges,updateNode,addNodes,onConnect,onNodeDoubleClick,onEdgesChange,onNodesChange,removeNodes,removeEdges,onEdgeDoubleClick } = useVueFlow()
 onConnect(addEdges)
 
 const useId:any = ref(null)
@@ -27,7 +26,7 @@ onMounted(()=>{
 const commonTransparentEdgeConfig={
   type: 'TestOne',
   animated:true,
-  style: { stroke: 'rgb(59,184,212)', strokeWidth: 3 },
+  style: { stroke: '#3BB8D4', strokeWidth: 3 },
   labelStyle: { fill: 'white', fontWeight: 600 },
   labelBgPadding: [8, 4],
   labelBgBorderRadius: 2,
@@ -39,26 +38,26 @@ const senceNodes:any=[
     id: '1',
     type: 'Line',
     position:{x:0, y:0},
-    data: { label: '', text:'1',visible:true,toolBarVisible:false },
+    data: { label: '', id:'1',visible:true,toolBarVisible:false },
 
   },
   {
     id: '2',
     type: 'Line',
     position:{x:1920, y:0},
-    data: { label: '', text:'2',visible:true,toolBarVisible:false },
+    data: { label: '', id:'2',visible:true,toolBarVisible:false },
   },
   {
     id: '3',
     type: 'Line',
     position:{x:1920, y:1080},
-    data: { label: '', text:'3',visible:true,toolBarVisible:false },
+    data: { label: '', id:'3',visible:true,toolBarVisible:false },
   },
   {
     id: '4',
     type: 'Line',
     position:{x:0, y:1080},
-    data: { label: '', text:'4',visible:true,toolBarVisible:false },
+    data: { label: '', id:'4',visible:true,toolBarVisible:false },
   },
   {
     id: '5',
@@ -116,14 +115,12 @@ const edges = ref<Edge[]>([
 ])
 
 function saveData(){
-  console.log(edges.value)
   localStorage.setItem('edges',JSON.stringify(edges.value))
   localStorage.setItem('nodes',JSON.stringify(nodes.value))
 }
 
 function loadData(){
   const findNodes = JSON.parse(localStorage.getItem('nodes'))
-
   if(!findNodes){
     addNodes(senceNodes)
     addEdges(senceEdges)
@@ -203,6 +200,42 @@ onNodeDoubleClick((event) => {
   })
 })
 
+const editEdgeLabelDialog=ref(false)
+const currentEdgeId=ref('')
+
+const edgeFormData = ref({
+  label:'',
+  status:'',
+  trans:false
+})
+
+
+onEdgeDoubleClick((event) => {
+  currentEdgeId.value=event.edge.data.id
+  edgeFormData.value.label=event.edge.data.label
+  edgeFormData.value.status=event.edge.style?.['stroke']
+  edgeFormData.value.trans=false
+  editEdgeLabelDialog.value=true
+})
+
+function submitEdgeLabel(){
+  edges.value.forEach((edge) => {
+    if(edge.data.id===currentEdgeId.value){
+      if(edgeFormData.value.trans){
+        const source = edge.source
+        updateEdge(edge,{source:edge.target,target:source,})
+      }
+      edge.data.id=edgeFormData.value.label
+      edge.data.label=edgeFormData.value.label
+      edge.style={stroke: edgeFormData.value.status, strokeWidth: 3}
+      edge.labelStyle={ fill: edgeFormData.value.status,fontSize: 16 }
+    }
+  })
+  saveData()
+  console.log(edges.value)
+  editEdgeLabelDialog.value=false
+}
+
 onEdgesChange(()=>{
   saveData()
 })
@@ -222,7 +255,6 @@ function handleShowData(){
 }
 
 function handleCancalClick(){
-  currentNode.value = null
   nodes.value.forEach((node) => {
     updateNode(node.id,{data:{...node.data,toolBarVisible:false}})
   })
@@ -234,44 +266,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('click', handleCancalClick)
 })
-
-function addLine(node:any){
-  let returnFlag = false
-  const storageId = Number(localStorage.getItem('useId'))
-  const id = storageId+1
-  edges.value.forEach((edge:any) => {
-    if(edge.source === node.id ||edge.target === node.id){
-      returnFlag =true
-    }
-  })
-  if(returnFlag){
-    return
-  }
-  updateNode(node.id,{data:{...node.data,relationNodeId:`${id}`}})
-  addNodes([{
-    id: `${id}`,
-    position: { x: node.position.x+200, y: node.position.y },
-    data: { label: '', text: String(id),visible:true,toolBarVisible:false,relationNodeId:`${node.id}` },
-    type:'Line'
-  }])
-  localStorage.setItem('useId',String(id))
-  const edgeId = 'e' + String(node.id) + '>' + String(id)
-  addEdges([{
-    id: edgeId,
-    source: String(node.id),
-    target: String(id),
-    label: edgeId,
-    ...commonTransparentEdgeConfig
-  }])
-}
-
-// watch(nodes,(nv,ov)=>{
-//   if (ov.length>nv.length) return
-//   const node = nodes.value[nodes.value.length-1]
-//   if(node.type === 'Line'){
-//     addLine(node)
-//   }
-// })
 
 function handleOnchange  (uploadFile: any)  {
   let file = uploadFile.raw  // 获取文件信息
@@ -319,7 +313,6 @@ function handleExportData(){
         :zoom-on-pinch="true"
         :zoom-on-double-click="true"
         :pan-on-drag="true"
-        :fit-view-on-init="true"
         :prevent-scrolling='false'
         :nodes-connectable="false"
 
@@ -339,11 +332,21 @@ function handleExportData(){
         <template #node-Bg="props">
           <BgNode :data="props.data" />
         </template>
+        <template #node-Free="props">
+          <FreeNode :data="props.data" />
+        </template>
 
         <template #edge-TestOne="props" >
           <TestOneEdge v-bind="props"/>
         </template>
-
+<!--        <Controls>-->
+<!--          <ControlButton>-->
+<!--            <i>dwdaw</i>-->
+<!--          </ControlButton>-->
+<!--          <ControlButton>-->
+<!--            <i>dwdaw</i>-->
+<!--          </ControlButton>-->
+<!--        </Controls>-->
 
         <Background style="background-color: rgb(0,18,29);" />
         <Panel>
@@ -351,7 +354,7 @@ function handleExportData(){
 <!--            <el-tag size="large" style="margin-right: 12px;min-width: 150px">当前选中节点Id:{{currentNode?.id}}</el-tag>-->
             <el-button @click="handleHideNode">{{ visibleFlag?'隐藏透明节点':'显示透明节点' }}</el-button>
 <!--            <el-button @click="handleDelNode">删除节点</el-button>-->
-<!--            <el-button @click="handleShowData">查看数据</el-button>-->
+            <el-button @click="handleShowData">查看数据</el-button>
             <el-button @click="handleExportData">导出数据</el-button>
             <el-upload
                 style="margin-left: 8px"
@@ -381,14 +384,34 @@ function handleExportData(){
                 <el-image :src="<string>Car" style="width: 100%;height: 100%" fit="contain"/>
               </div>
             </el-space>
-<!--            <el-button @click="handleLine">添加一条线</el-button>-->
-<!--            <el-button @click="handleLine">添加一条线</el-button>-->
-
         </Panel>
       </VueFlow>
 <!--      <el-image :draggable="false" style="position: absolute;top:46px;left: 253.4px;height: 796px;z-index: 0" fit="cover" :src="bgTest"/>-->
     </div>
-
+    <el-dialog v-model="editEdgeLabelDialog" width="400px">
+      <el-form label-width="100px">
+        <el-form-item label="请输入显示值:">
+          <el-input v-model="edgeFormData.label"/>
+        </el-form-item>
+        <el-form-item label="请选择状态:">
+          <el-select v-model="edgeFormData.status">
+            <el-option label="待机" value="#9B9B9B"/>
+            <el-option label="正常" value="#3BB8D4"/>
+            <el-option label="报警" value="#D99527"/>
+            <el-option label="故障" value="#D95328"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="是否转向:">
+          <el-select v-model="edgeFormData.trans">
+            <el-option label="是" :value="true"/>
+            <el-option label="否" :value="false"/>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="submitEdgeLabel">确定</el-button>
+      </template>
+    </el-dialog>
   </TheContainer>
 </template>
 

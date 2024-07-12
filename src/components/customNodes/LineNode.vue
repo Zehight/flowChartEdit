@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Handle, Position,useNode,useVueFlow } from '@vue-flow/core'
+import { Handle, Position,useNode,useVueFlow,useNodeId } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
 import {Delete} from '@element-plus/icons-vue'
 const { removeNodes } = useVueFlow()
@@ -7,13 +7,16 @@ const { removeNodes } = useVueFlow()
 
 export interface ITestOneNodeData{
   label:string
-  text:string
   toolBarVisible:boolean
   visible:boolean
+  id:string
 }
 
+
 const props = defineProps(['data'])
-const currentNode = useNode(props.data.text).node
+const currentNode = useNode(useNodeId()).node
+
+
 const relationNode = useNode(props.data.relationNodeId).node
 
 </script>
@@ -24,12 +27,12 @@ const relationNode = useNode(props.data.relationNodeId).node
   </NodeToolbar>
   <div class="node" :class="props.data.visible?'show':'hidden'">
     <Handle
-        style="transform: translate(6px,-2px)"
+        style="transform: translate(3px,-2px)"
       type="target"
       :position="Position.Left"
     />
     <Handle
-        style="transform: translate(6px,-2px)"
+        style="transform: translate(3px,-2px)"
       type="source"
       :position="Position.Left"
     />
@@ -56,8 +59,8 @@ const relationNode = useNode(props.data.relationNodeId).node
 
 .show{
   font-size: 16px;
-  height: 8px;
-  width: 8px;
+  height: 2px;
+  width: 2px;
   text-align: center;
   border: 2px solid #38bdf8;
   border-radius: 100px;
