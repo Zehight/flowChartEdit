@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useNode,useNodeId } from '@vue-flow/core'
-import BG from '@/assets/image/mjsbg.png'
 
 const props = defineProps(['data'])
 
@@ -17,7 +16,7 @@ const currentNode = useNode(useNodeId()).node
 <!--  </NodeToolbar>-->
   <div class="node">
 <!--    <div class="commonTong" :style="progressGradient"/>-->
-    <el-image  :draggable="false" fit="contain" :src="BG" style="width: 1920px;height: 1080px;opacity: 0.5"/>
+    <el-image  :draggable="false" fit="contain" src="https://mycos-1259115987.cos.ap-shanghai.myqcloud.com/mjsbg.png" style="width: 1920px;height: 1080px;opacity: 0.5"/>
 <!--    <div class="commonTong" style="background-color: #ffb546;height: 30px;width: 30px;position: absolute;top:0"/>-->
   </div>
 
