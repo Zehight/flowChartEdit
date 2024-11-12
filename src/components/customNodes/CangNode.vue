@@ -1,24 +1,18 @@
 <script lang="ts" setup>
 import { useNode,Position,useVueFlow } from '@vue-flow/core'
 import {Delete,Plus} from '@element-plus/icons-vue'
-const { removeNodes,updateNode,onNodesChange } = useVueFlow()
+const { removeNodes,updateNode } = useVueFlow()
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import car from '@/assets/image/che2.png'
+import Cang from '@/assets/image/cang.png'
 
 
 const props = defineProps(['data'])
 const currentNode = useNode(props.data.text).node
 
 
-
-
-// onMounted(()=>{
-//
-// })
-
-// onNodesChange(()=>{
-//   updateNode(currentNode.id,{position:{x:currentNode.position.x-props.data.distance*3,y:currentNode.position.y}})
-// })
+onMounted(()=>{
+  updateNode(currentNode.id,{position:{x:currentNode.position.x-props.data.distance,y:currentNode.position.y}})
+})
 
 </script>
 
@@ -29,8 +23,11 @@ const currentNode = useNode(props.data.text).node
   </NodeToolbar>
   <div class="node">
 <!--    <div class="commonTong" :style="progressGradient"/>-->
-    <el-image fit="contain" :src="car" style="width: 40px;height: 40px"/>
-    <div style="position: absolute;bottom: 18px;font-size: 8px;left: 0;right: 0;display: flex;justify-content: center">{{props.data.distance}}</div>
+    <el-image fit="contain" :src="Cang" style="width: 40px;height: 40px"/>
+    <div style="position: absolute;bottom: 20px;font-size: 8px;left: 10px;display: flex;justify-content: center;color: #00F0FFFF">{{props.data.tongValue}}</div>
+    <div style="position: absolute;bottom: 20px;font-size: 8px;left: 28px;display: flex;justify-content: center;color: #00F0FFFF">m</div>
+    <div style="position: absolute;bottom: 6px;font-size: 8px;left: 0;right: 0;display: flex;justify-content: center">{{props.data.label}}</div>
+<!--    <div style="position: absolute;bottom: 18px;font-size: 8px;left: 0;right: 0;display: flex;justify-content: center">{{props.data.id}}</div>-->
 
     <!--    <div class="commonTong" style="background-color: #ffb546;height: 30px;width: 30px;position: absolute;top:0"/>-->
   </div>

@@ -137,7 +137,15 @@ export default function useDragAndDrop() {
       }
       addNodes(newNode)
     }
-    else{
+    else if(draggedType.value === 'Car'){
+      const newNode:any = {
+        id: nodeId,
+        type: draggedType.value,
+        position,
+        data: { label: '',id: String(nodeId),toolBarVisible:false,distance:20 },
+      }
+      addNodes(newNode)
+    }else{
       const newNode:any = {
         id: nodeId,
         type: draggedType.value,
