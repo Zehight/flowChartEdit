@@ -9,7 +9,7 @@ import {Delete} from '@element-plus/icons-vue'
 const props = defineProps<EdgeProps>()
 const currentEdge = useEdge(props.id)
 
-const label=() => h(ShiftingEdgeLabel, { label: props.data.label, offset_y: -10,offset_x:30 })
+const label=() => h(ShiftingEdgeLabel, { label: props.data.label, offset_y: -10+(+props.data.offset_y || 0),offset_x:30+(props.data.offset_x || 0) })
 </script>
 
 
@@ -19,7 +19,6 @@ const label=() => h(ShiftingEdgeLabel, { label: props.data.label, offset_y: -10,
     <el-button type="danger" size="small" :icon="Delete" circle />
   </NodeToolbar>
   <StraightEdge
-      style="z-index: -10;"
       v-bind="props"
       :label="label"
   >

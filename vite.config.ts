@@ -28,7 +28,7 @@ function getBase(mode: string) {
 export default ({mode, command}) =>
   defineConfig({
     server: {
-      port: 3000,
+      port: 3005,
       hmr: true,
       // proxy: {
       //   '/api': {

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Handle, Position,useNode,useVueFlow,useNodeId } from '@vue-flow/core'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import {Delete} from '@element-plus/icons-vue'
-const { removeNodes } = useVueFlow()
+import {Delete,Grid} from '@element-plus/icons-vue'
+const { removeNodes,updateNode } = useVueFlow()
 
 
 export interface ITestOneNodeData{
@@ -18,12 +18,21 @@ const currentNode = useNode(useNodeId()).node
 
 
 const relationNode = useNode(props.data.relationNodeId).node
+function resetPosition(){
+  if(Math.abs(currentNode.position.y-relationNode.position.y)<10){
+    updateNode(relationNode.id,{position:{x:relationNode.position.x,y:currentNode.position.y}})
+  }
+  if(Math.abs(currentNode.position.x-relationNode.position.x)<10){
+    updateNode(relationNode.id,{position:{x:currentNode.position.x,y:relationNode.position.y}})
+  }
 
+}
 </script>
 
 <template>
   <NodeToolbar :is-visible="props.data.toolBarVisible" :position="Position.Top">
     <el-button @click="removeNodes([currentNode,relationNode])" type="danger" size="small" :icon="Delete" circle />
+    <el-button @click="resetPosition" type="danger" size="small" :icon="Grid" circle />
   </NodeToolbar>
   <div class="node" :class="props.data.visible?'show':'hidden'">
     <Handle
