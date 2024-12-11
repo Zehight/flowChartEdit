@@ -55,21 +55,18 @@ function saveData(){
 }
 
 function loadData(){
-  const findNodes = JSON.parse(localStorage.getItem('nodes'))
+  const findNodes = JSON.parse(localStorage.getItem('nodes') || '[]')
   if(!findNodes){
     addNodes(senceNodes)
     addEdges(senceEdges)
-
   }
-  const locationEdges = JSON.parse(localStorage.getItem('edges'))
+  const locationEdges = JSON.parse(localStorage.getItem('edges') || '[]')
   if(locationEdges){
-    // addEdges(locationEdges)
     edges.value=locationEdges
   }
-  const locationNodes = JSON.parse(localStorage.getItem('nodes'))
+  const locationNodes = JSON.parse(localStorage.getItem('nodes') || '[]')
   if(locationNodes){
     nodes.value=locationNodes
-    // addNodes(locationNodes)
   }
   nextTick(()=>{
     edges.value.forEach(edge=>{
@@ -117,7 +114,7 @@ function handleAddNode(event,type){
 function handleNodeClick(e:any){
   if(e.node.type==='Bg'){
     nodes.value.forEach((node) => {
-      updateNode(node.id,{selectable:false,selected:false})
+      updateNode(node.id,{selectable:false})
     })
   }
 }
@@ -150,12 +147,13 @@ onEdgeDoubleClick((event) => {
   edgeFormData.value.offset_y=event.edge.data.offset_y || 0
   edgeFormData.value.carGroupId=event.edge.data.carGroupId || ''
   edgeFormData.value.fontSize=<number>event.edge.labelStyle?.['fontSize']
-  edgeFormData.value.status=event.edge.style?.['stroke']
+  edgeFormData.value.status = (event.edge.style as any)?.['stroke']
   edgeFormData.value.trans=false
   nodeDialog.value=false
   editEdgeLabelDialog.value=true
   edges.value.forEach((edge)=>{
-    edge.labelStyle.fontSize=12
+    edge.labelStyle = edge.labelStyle || {}
+    edge.labelStyle.fontSize = 12
   })
 })
 
@@ -203,7 +201,8 @@ function submitEdgeLabel(){
     if(edge.id===currentEdgeId.value){
       if(edgeFormData.value.trans){
         const source = edge.source
-        updateEdge(edge,{source:edge.target,target:source,})
+        edge.source=edge.target
+        edge.target=source
       }
       edge.data.id=edgeFormData.value.id
       edge.data.carGroupId=edgeFormData.value.carGroupId
@@ -211,7 +210,7 @@ function submitEdgeLabel(){
       edge.data.offset_x=edgeFormData.value.offset_x
       edge.data.offset_y=edgeFormData.value.offset_y
       edge.style={stroke: edgeFormData.value.status, strokeWidth: 8}
-      edge.labelStyle={ fill: edgeFormData.value.status,fontSize: edgeFormData.value.fontSize }
+      edge.labelStyle={ fill: 'rgba(138,138,138,0.85)',fontSize: edgeFormData.value.fontSize }
     }
   })
   saveData()
@@ -274,7 +273,6 @@ function handleExportData(){
 function handleAllAnimate(){
   edges.value.forEach((edge:any) => {
     edge.style={stroke: 'rgba(86,255,39,0.85)',strokeWidth:'8','stroke-dasharray':'40px 12px'},
-    console.log(edge.animated)
     edge.animated=true
     // updateEdge(edge,{animated:true})
   })
@@ -284,7 +282,6 @@ function handleAllAnimateClose(){
   edges.value.forEach((edge:any) => {
     edge.style={stroke: 'rgba(138,138,138,0.85)',strokeWidth:'8'},
     edge.animated=false
-    // updateEdge(edge,{animated:true})
   })
 }
 
@@ -338,7 +335,7 @@ function handleAllAnimateClose(){
           <TestOneEdge v-bind="props"/>
         </template>
         <Background style="background-color: rgb(0,18,29);" />
-        <Panel>
+        <Panel position="top-left">
           <el-row style="align-items: center">
 <!--            <el-tag size="large" style="margin-right: 12px;min-width: 150px">当前选中节点Id:{{currentNode?.id}}</el-tag>-->
             <el-button @click="handleHideNode">{{ visibleFlag?'隐藏透明节点':'显示透明节点' }}</el-button>
@@ -359,7 +356,7 @@ function handleAllAnimateClose(){
             </el-upload>
           </el-row>
         </Panel>
-        <Panel style="top:40px">
+        <Panel position="top-right" style="top:40px">
             <el-space direction="vertical" style="margin-top: 12px">
 <!--            <div class="nodeItem" @mousedown="handleAddLine">-->
             <div class="nodeItem" :draggable="true" @dragstart="handleAddNode($event,'Line')">
@@ -483,7 +480,7 @@ function handleAllAnimateClose(){
 }
 
 :deep(.vue-flow__edge.animated path){
-  //stroke-dashoffset:30;
+  stroke-dashoffset:30;
   animation: dashdraw 2s linear infinite;
 }
 
