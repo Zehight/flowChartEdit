@@ -2,6 +2,7 @@
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/controls/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
+import '@vue-flow/node-resizer/dist/style.css'
 import { VueFlow, Panel, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import lineImg from '@/assets/image/line.png'
@@ -11,6 +12,7 @@ import Car from '@/assets/image/che2.png'
 import Cang from '@/assets/image/cang.png'
 import useDragAndDrop from '@/modules/useDnD'
 import type { Node, Edge } from '@vue-flow/core'
+import bgTest from '@/assets/image/cankao.png'
 import { ControlButton, Controls } from '@vue-flow/controls'
 // import type {ITestOneNodeData} from '@/components/customNodes/LineNode.vue'
 
@@ -18,7 +20,8 @@ const { onDragOver, onDrop, onDragLeave, onDragStart } = useDragAndDrop()
 const { updateEdge, addEdges, updateNode, addNodes, onConnect, onNodeDoubleClick, onEdgesChange, onNodesChange, removeNodes, removeEdges, onEdgeDoubleClick } = useVueFlow()
 onConnect(addEdges)
 
-const useId: any = ref(null)
+const useId: any = ref(Number(localStorage.getItem('useId')) || 100)
+console.log(useId.value)
 
 onMounted(() => {
   loadData()
@@ -35,7 +38,19 @@ const commonTransparentEdgeConfig = {
 }
 
 const senceNodes: any = [
-
+  {
+    id: '100',
+    type: 'Bg',
+    position: { x: 0, y: 0 },
+    data: {
+      id: 'bg',
+      label: '背景节点',
+      visible: true
+    },
+    selectable: false,
+    draggable: false,
+    deletable: false
+  }
 ]
 
 const senceEdges: any = [
@@ -56,7 +71,7 @@ function saveData() {
 
 function loadData() {
   const findNodes = JSON.parse(localStorage.getItem('nodes') || '[]')
-  if (!findNodes) {
+  if (!findNodes || findNodes.length === 0) {
     addNodes(senceNodes)
     addEdges(senceEdges)
   }
@@ -71,10 +86,15 @@ function loadData() {
   nextTick(() => {
     edges.value.forEach(edge => {
       edge.animated = false
-      edge.style = { stroke: '#656565', strokeWidth: '8' }
+      edge.style = { stroke: '#656565', strokeWidth: '4' }
     })
-    const maxId = Math.max(...nodes.value.map(obj => Number(obj.id)))
-    localStorage.setItem('useId', String(maxId + 1))
+    // 修复 -Infinity 问题：当没有节点时，maxId 应该为 0
+    const maxId = nodes.value.length > 0 ? Math.max(...nodes.value.map(obj => Number(obj.id))) : 100
+    console.log(Math.max(...nodes.value.map(obj => Number(obj.id))))
+    const newUseId = maxId + 1
+    console.log(newUseId)
+    localStorage.setItem('useId', String(newUseId))
+    useId.value = newUseId
   })
 
 }
@@ -88,6 +108,9 @@ function handleHideNode() {
       if (node.type === 'Line') {
         node.data.visible = true
       }
+      if (node.type === 'Zhuan') {
+        node.data.visible = true
+      }
       if (node.type === 'Bg') {
         node.hidden = false
       }
@@ -95,6 +118,9 @@ function handleHideNode() {
   } else {
     nodes.value.forEach((node) => {
       if (node.type === 'Line') {
+        node.data.visible = false
+      }
+      if (node.type === 'Zhuan') {
         node.data.visible = false
       }
       if (node.type === 'Bg') {
@@ -163,7 +189,8 @@ const nodeFormData = ref({
   id: '',
   distance: 10.29,
   tongValue: 0,
-  label: ''
+  label: '',
+  zhuanValue: 0
 })
 
 onNodeDoubleClick((event) => {
@@ -181,6 +208,7 @@ onNodeDoubleClick((event) => {
   nodeFormData.value.distance = event.node.data.distance || 0
   nodeFormData.value.label = event.node.data.label || ''
   nodeFormData.value.tongValue = event.node.data.tongValue || 0
+  nodeFormData.value.zhuanValue = event.node.data.zhuanValue || 0
   editEdgeLabelDialog.value = false
   nodeDialog.value = true
 })
@@ -189,7 +217,7 @@ function submitNodeLabel() {
   nodes.value.forEach((node) => {
     if (node.id === currentNodeId.value) {
       console.log('aaa')
-      updateNode(node.id, { data: { ...node.data, id: nodeFormData.value.id, label: nodeFormData.value.label, distance: nodeFormData.value.distance, tongValue: nodeFormData.value.tongValue } })
+      updateNode(node.id, { data: { ...node.data, id: nodeFormData.value.id, label: nodeFormData.value.label, distance: nodeFormData.value.distance, tongValue: nodeFormData.value.tongValue, zhuanValue: nodeFormData.value.zhuanValue } })
     }
   })
   saveData()
@@ -254,8 +282,12 @@ function handleOnchange(uploadFile: any) {
     nodes.value = useData.nodes
     edges.value = useData.edges
     nextTick(() => {
-      const maxId = Math.max(...nodes.value.map(obj => Number(obj.id)))
-      localStorage.setItem('useId', String(maxId + 1))
+      // 修复 -Infinity 问题：当没有节点时，maxId 应该为 0
+      const maxId = nodes.value.length > 0 ? Math.max(...nodes.value.map(obj => Number(obj.id))) : 0
+      const newUseId = maxId + 1
+      console.log(newUseId)
+      localStorage.setItem('useId', String(newUseId))
+      useId.value = newUseId
     })
   }
 }
@@ -272,16 +304,16 @@ function handleExportData() {
 
 function handleAllAnimate() {
   edges.value.forEach((edge: any) => {
-    edge.style = { stroke: 'rgba(86,255,39,0.85)', strokeWidth: '8', 'stroke-dasharray': '40px 12px' },
-      edge.animated = true
+    edge.style = { stroke: 'rgba(86,255,39,0.85)', strokeWidth: '4', 'stroke-dasharray': '40px 12px' }
+    edge.animated = true
     // updateEdge(edge,{animated:true})
   })
 }
 
 function handleAllAnimateClose() {
   edges.value.forEach((edge: any) => {
-    edge.style = { stroke: 'rgba(138,138,138,0.85)', strokeWidth: '8' },
-      edge.animated = false
+    edge.style = { stroke: 'rgba(138,138,138,0.85)', strokeWidth: '4' }
+    edge.animated = false
   })
 }
 
@@ -295,7 +327,8 @@ function handleAllAnimateClose() {
       <VueFlow style="width: 100vw;height: calc(100vh - 60px);border: 1px solid black;" v-model:nodes="nodes"
         v-model:edges="edges" @nodeClick="handleNodeClick" @dragover="onDragOver" @dragleave="onDragLeave"
         :pan-on-scroll="true" :zoom-on-scroll="true" :zoom-on-pinch="true" :zoom-on-double-click="true"
-        :pan-on-drag="true" :prevent-scrolling='false' :nodes-connectable="false">
+        :pan-on-drag="true" :prevent-scrolling='false' :nodes-connectable="false" :snap-to-grid="true"
+        :snap-grid="[10, 10]">
         <template #node-Line="props">
           <LineNode :data="props.data" />
         </template>
@@ -316,6 +349,9 @@ function handleAllAnimateClose() {
         </template>
         <template #node-Cang="props">
           <CangNode :data="props.data" />
+        </template>
+        <template #node-Zhuan="props">
+          <ZhuanNode :data="props.data" />
         </template>
 
         <template #edge-TestOne="props">
@@ -355,10 +391,14 @@ function handleAllAnimateClose() {
             <div class="nodeItem" :draggable="true" @dragstart="handleAddNode($event, 'Cang')">
               <el-image :src="<string>Cang" style="width: 100%;height: 100%" fit="contain" />
             </div>
+            <div class="nodeItem" :draggable="true" @dragstart="handleAddNode($event, 'Zhuan')">
+              <div class="nodeItem">转</div>
+            </div>
           </el-space>
         </Panel>
       </VueFlow>
-      <!--      <el-image :draggable="false" style="position: absolute;top:46px;left: 253.4px;height: 796px;z-index: 0" fit="cover" :src="bgTest"/>-->
+      <!-- <el-image :draggable="false" style="position: absolute;top:46px;left: 253.4px;height: 796px;z-index: 0"
+        fit="cover" :src="bgTest" /> -->
     </div>
     <div v-if="editEdgeLabelDialog"
       style="width: 400px;height: 100%;position: absolute;right:0;top:0;background: #ffffff;padding: 32px">
@@ -415,6 +455,9 @@ function handleAllAnimateClose() {
         </el-form-item>
         <el-form-item label="请输入筒数据:">
           <el-input v-model="nodeFormData.tongValue" />
+        </el-form-item>
+        <el-form-item label="请输入转值:">
+          <el-input v-model="nodeFormData.zhuanValue" />
         </el-form-item>
       </el-form>
       <!--      <template #footer>-->
