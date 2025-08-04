@@ -2,8 +2,8 @@
 import { useNode, Position, useVueFlow } from '@vue-flow/core'
 import { Delete, Plus } from '@element-plus/icons-vue'
 const { removeNodes, updateNode } = useVueFlow()
+import { NodeResizer } from '@vue-flow/node-resizer'
 import { NodeToolbar } from '@vue-flow/node-toolbar'
-import Cang from '@/assets/image/cang.png'
 
 
 const props = defineProps(['data'])
@@ -24,19 +24,8 @@ onMounted(() => {
       type="danger" size="small" :icon="Plus" circle />
   </NodeToolbar>
   <div class="node">
-    <!--    <div class="commonTong" :style="progressGradient"/>-->
-    <el-image fit="contain" :src="Cang" style="width: 40px;height: 40px" />
-    <div
-      style="position: absolute;bottom: 20px;font-size: 8px;left: 10px;display: flex;justify-content: center;color: #00F0FFFF">
-      {{ props.data.tongValue }}</div>
-    <div
-      style="position: absolute;bottom: 20px;font-size: 8px;left: 28px;display: flex;justify-content: center;color: #00F0FFFF">
-      m</div>
-    <div style="position: absolute;bottom: 6px;font-size: 8px;left: 0;right: 0;display: flex;justify-content: center">
-      {{ props.data.label }}</div>
-    <!--    <div style="position: absolute;bottom: 18px;font-size: 8px;left: 0;right: 0;display: flex;justify-content: center">{{props.data.id}}</div>-->
-
-    <!--    <div class="commonTong" style="background-color: #ffb546;height: 30px;width: 30px;position: absolute;top:0"/>-->
+    <NodeResizer style="background-color: red;" :min-width="50" :min-height="30" />
+    <div class="text-node">{{ props.data.label }}</div>
   </div>
 
 
@@ -56,8 +45,23 @@ onMounted(() => {
 
 .node {
   color: white;
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3BB8D4;
+  border-radius: 10px;
+}
+
+.node-label {
+  color: white;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

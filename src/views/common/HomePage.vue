@@ -10,6 +10,7 @@ import wrench from '@/assets/image/che1.png'
 import Car from '@/assets/image/che2.png'
 import Cang from '@/assets/image/cang.png'
 import useDragAndDrop from '@/modules/useDnD'
+import '@vue-flow/node-resizer/dist/style.css'
 import type { Node, Edge } from '@vue-flow/core'
 import { ControlButton, Controls } from '@vue-flow/controls'
 // import type {ITestOneNodeData} from '@/components/customNodes/LineNode.vue'
@@ -107,6 +108,7 @@ function handleHideNode() {
 
 
 function handleAddNode(event: DragEvent, type: string) {
+  console.log(type)
   onDragStart(event, type)
 }
 
@@ -317,6 +319,9 @@ function handleAllAnimateClose() {
         <template #node-Cang="props">
           <CangNode :data="props.data" />
         </template>
+        <template #node-Zhuan="props">
+          <ZhuanNode :data="props.data" />
+        </template>
 
         <template #edge-TestOne="props">
           <TestOneEdge v-bind="props" />
@@ -355,6 +360,9 @@ function handleAllAnimateClose() {
             <div class="nodeItem" :draggable="true" @dragstart="handleAddNode($event, 'Cang')">
               <el-image :src="<string>Cang" style="width: 100%;height: 100%" fit="contain" />
             </div>
+            <div class="nodeItem" :draggable="true" @dragstart="handleAddNode($event, 'Zhuan')">
+              <div style="font-size: 16px;height: 100%;width: 100%;text-align: center;color: #fff;">转</div>
+            </div>
           </el-space>
         </Panel>
       </VueFlow>
@@ -362,6 +370,8 @@ function handleAllAnimateClose() {
     </div>
     <div v-if="editEdgeLabelDialog"
       style="width: 400px;height: 100%;position: absolute;right:0;top:0;background: #ffffff;padding: 32px">
+      <!-- 关闭按钮 -->
+      <el-button @click="editEdgeLabelDialog = false">关闭</el-button>
       <el-form label-width="100px">
         <el-form-item label="请输入ID:">
           <el-input v-model="edgeFormData.id" />
@@ -403,6 +413,8 @@ function handleAllAnimateClose() {
 
     <div v-if="nodeDialog"
       style="width: 400px;height: 100%;position: absolute;right:0;top:0;background: #ffffff;padding: 32px">
+      <!-- 关闭按钮 -->
+      <el-button @click="nodeDialog = false">关闭</el-button>
       <el-form label-width="100px">
         <el-form-item label="请输入ID:">
           <el-input v-model="nodeFormData.id" />
