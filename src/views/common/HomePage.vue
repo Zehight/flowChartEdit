@@ -72,7 +72,7 @@ function loadData() {
   nextTick(() => {
     edges.value.forEach(edge => {
       edge.animated = false
-      edge.style = { stroke: '#656565', strokeWidth: '8' }
+      edge.style = { stroke: '#656565', strokeWidth: '4' }
     })
     const maxId = Math.max(...nodes.value.map(obj => Number(obj.id)))
     localStorage.setItem('useId', String(maxId + 1))
@@ -136,14 +136,15 @@ const edgeFormData = ref({
   offset_x: 0,
   offset_y: 0,
   fontSize: 16,
-  carGroupId: ''
+  carGroupId: '',
+  code: ''
 })
 
 
 onEdgeDoubleClick((event) => {
-
   currentEdgeId.value = event.edge.id
   edgeFormData.value.id = event.edge.data.id
+  edgeFormData.value.code = event.edge.data.code
   edgeFormData.value.label = event.edge.data.label
   edgeFormData.value.offset_x = event.edge.data.offset_x || 0
   edgeFormData.value.offset_y = event.edge.data.offset_y || 0
@@ -165,7 +166,8 @@ const nodeFormData = ref({
   id: '',
   distance: 10.29,
   tongValue: 0,
-  label: ''
+  label: '',
+  zhuanValue: '1'
 })
 
 onNodeDoubleClick((event) => {
@@ -183,6 +185,7 @@ onNodeDoubleClick((event) => {
   nodeFormData.value.distance = event.node.data.distance || 0
   nodeFormData.value.label = event.node.data.label || ''
   nodeFormData.value.tongValue = event.node.data.tongValue || 0
+  nodeFormData.value.zhuanValue = event.node.data.zhuanValue || '1'
   editEdgeLabelDialog.value = false
   nodeDialog.value = true
 })
@@ -191,10 +194,11 @@ function submitNodeLabel() {
   nodes.value.forEach((node) => {
     if (node.id === currentNodeId.value) {
       console.log('aaa')
-      updateNode(node.id, { data: { ...node.data, id: nodeFormData.value.id, label: nodeFormData.value.label, distance: nodeFormData.value.distance, tongValue: nodeFormData.value.tongValue } })
+      updateNode(node.id, { data: { ...node.data, id: nodeFormData.value.id, label: nodeFormData.value.label, distance: nodeFormData.value.distance, tongValue: nodeFormData.value.tongValue, zhuanValue: nodeFormData.value.zhuanValue } })
     }
   })
   saveData()
+  ElMessage.success('保存成功')
   console.log(nodes.value)
 }
 
@@ -207,15 +211,18 @@ function submitEdgeLabel() {
         edge.target = source
       }
       edge.data.id = edgeFormData.value.id
+      edge.data.code = edgeFormData.value.code
       edge.data.carGroupId = edgeFormData.value.carGroupId
       edge.data.label = edgeFormData.value.label
       edge.data.offset_x = edgeFormData.value.offset_x
       edge.data.offset_y = edgeFormData.value.offset_y
-      edge.style = { stroke: edgeFormData.value.status, strokeWidth: 8 }
-      edge.labelStyle = { fill: 'rgba(138,138,138,0.85)', fontSize: edgeFormData.value.fontSize }
+      edge.style = { stroke: edgeFormData.value.status, strokeWidth: 4 }
+      edge.labelStyle = { fill: 'rgba(255,255,255,1)', fontSize: edgeFormData.value.fontSize }
+      edge.labelBgStyle = { fillOpacity: 0, y: edgeFormData.value.offset_y - 17, fill: '#10b981', x: edgeFormData.value.offset_x + 22, padding: 0 }
     }
   })
   saveData()
+  ElMessage.success('保存成功')
   console.log(edges.value)
 }
 
@@ -274,7 +281,7 @@ function handleExportData() {
 
 function handleAllAnimate() {
   edges.value.forEach((edge: any) => {
-    edge.style = { stroke: 'rgba(86,255,39,0.85)', strokeWidth: '8', 'stroke-dasharray': '40px 12px' },
+    edge.style = { stroke: 'rgba(86,255,39,0.85)', strokeWidth: '4', 'stroke-dasharray': '24px 12px' },
       edge.animated = true
     // updateEdge(edge,{animated:true})
   })
@@ -282,7 +289,7 @@ function handleAllAnimate() {
 
 function handleAllAnimateClose() {
   edges.value.forEach((edge: any) => {
-    edge.style = { stroke: 'rgba(138,138,138,0.85)', strokeWidth: '8' },
+    edge.style = { stroke: 'rgba(138,138,138,0.85)', strokeWidth: '4' },
       edge.animated = false
   })
 }
@@ -376,7 +383,10 @@ function handleAllAnimateClose() {
         <el-form-item label="请输入ID:">
           <el-input v-model="edgeFormData.id" />
         </el-form-item>
-        <el-form-item label="请输入小车ID:">
+        <el-form-item label="请输入编码:">
+          <el-input v-model="edgeFormData.code" />
+        </el-form-item>
+        <el-form-item label="请输入组ID:">
           <el-input v-model="edgeFormData.carGroupId" />
         </el-form-item>
         <el-form-item label="请输入显示值:">
@@ -427,6 +437,9 @@ function handleAllAnimateClose() {
         </el-form-item>
         <el-form-item label="请输入筒数据:">
           <el-input v-model="nodeFormData.tongValue" />
+        </el-form-item>
+        <el-form-item label="请输入转值:">
+          <el-input v-model="nodeFormData.zhuanValue" />
         </el-form-item>
       </el-form>
       <!--      <template #footer>-->
@@ -482,13 +495,13 @@ function handleAllAnimateClose() {
 }
 
 :deep(.vue-flow__edge.animated path) {
-  stroke-dashoffset: 30;
-  animation: dashdraw 2s linear infinite;
+  stroke-dashoffset: 0;
+  animation: dashdraw 1s linear infinite;
 }
 
 @keyframes dashdraw {
   0% {
-    stroke-dashoffset: -104;
+    stroke-dashoffset: -72;
   }
 }
 </style>

@@ -24,14 +24,19 @@ onMounted(() => {
       type="danger" size="small" :icon="Plus" circle />
   </NodeToolbar>
   <div class="node">
-    <NodeResizer style="background-color: red;" :min-width="50" :min-height="30" />
-    <div class="text-node">{{ props.data.label }}</div>
+    <NodeResizer style="background-color: red;" :min-width="32" :min-height="16" />
+    <div class="text-node">{{ props.data.zhuanValue || '1' }}</div>
   </div>
 
 
 </template>
 
 <style scoped>
+/* 优化展示 */
+:deep(.vue-flow__resize-control) {
+  /* display: none; */
+}
+
 .node:deep(.vue-flow__handle) {
   background: transparent;
   border: none;
@@ -52,7 +57,8 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   background-color: #3BB8D4;
-  border-radius: 10px;
+  font-size: 8px;
+  border-radius: 8px;
 }
 
 .node-label {
@@ -61,6 +67,17 @@ onMounted(() => {
   width: 100%;
   text-align: center;
   display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.node-label {
+  color: white;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  font-size: 10px;
   justify-content: center;
   align-items: center;
 }
